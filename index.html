@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multiple Countdown Timers</title>
+    <style>
+        body{
+            font-family: Arial,sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            height: 100vh;
+            margin: 0;
+            background-color: #f4f4f9;
+        }
+        .timer{
+            font-size: 50px;
+            background-color: #333;
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            margin-top: 20px;
+        }
+        .label{
+            font-size: 20px;
+            text-transform: uppercase;
+        }
+        input{
+            padding: 10px;
+            font-size: 18px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        button{
+            padding: 10px 20px;
+            font-size: 18px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover{
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <h2>Enter a future date and time to start a countdown</h2>
+    <input type="datetime-local" id="targetDateInput">
+    <button onclick="startCountdown()">Start Countdown</button>
+    <div id="timers"></div>
+    <script>
+        let countdownInterval;
+        let currentTimer;
+        function startCountdown(){
+        let userDateInput=document.getElementById("targetDateInput").value;
+        if(!userDateInput){
+        alert("Please enter a valid date and time!");
+        return;
+    }
+    let targetDate=new Date(userDateInput).getTime();
+    if(targetDate<new Date().getTime()){
+        alert("Please enter a future date!");
+        return;
+    }
+    if(currentTimer){
+        clearInterval(currentTimer.interval);
+        document.getElementById("timers").removeChild(currentTimer.timerDiv);
+    }
+    let timerDiv=document.createElement('div');
+    timerDiv.classList.add('timer');
+    document.getElementById('timers').appendChild(timerDiv);
+    currentTimer={ timerDiv,interval:null };
+    currentTimer.interval=setInterval(function(){
+        let now=new Date().getTime();
+        let timeLeft=targetDate-now;
+        let days=Math.floor(timeLeft/(1000*60*60*24));
+        let hours=Math.floor((timeLeft%(1000*60*60*24))/(1000*60*60));
+        let minutes=Math.floor((timeLeft%(1000*60*60))/(1000*60));
+        let seconds=Math.floor((timeLeft%(1000*60))/1000);
+        timerDiv.innerHTML=`
+            <div><span>${days<10?"0"+days:days}</span><span class="label">Days</span></div>
+            <div><span>${hours<10?"0"+hours:hours}</span><span class="label">Hours</span></div>
+            <div><span>${minutes<10?"0"+minutes:minutes}</span><span class="label">Minutes</span></div>
+            <div><span>${seconds<10?"0"+seconds:seconds}</span><span class="label">Seconds</span></div>
+        `;
+        if(timeLeft<=0){
+            clearInterval(currentTimer.interval);
+            timerDiv.innerHTML="<div>EXPIRED</div>";
+            currentTimer=null;
+        }
+    },1000);
+}
+    </script>
+</body>
+</html>
